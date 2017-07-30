@@ -142,11 +142,25 @@ public class PlayScreen implements Screen {
 		
 		game.batch.setProjectionMatrix(hud.stage.getCamera().combined);
 		hud.stage.draw();
-		//music.play();
+		music.play();
+		if(gameOver()){
+			Postac.bombaIsDead = false;
+			Postac.Dead = false;
+			game.setScreen(new GameOver(game));
+			
+			dispose();
+		}
+		if(Postac.finishlev){
+			Postac.finishlev = false;
+			
+			game.setScreen(new GameOver(game));
+			
+			dispose();
+		}
 		
 	}
 	private void handleinput(float dt) {
-		
+	if(player.curentState!=Postac.State.DEAD){
 		if ((Gdx.input.isKeyJustPressed(Input.Keys.UP))){
 			player.b2body.applyLinearImpulse(new Vector2(0,5f),player.b2body.getWorldCenter(),true);
 			//sound.play(2.0f);
@@ -158,7 +172,7 @@ public class PlayScreen implements Screen {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x >= -2)
             player.b2body.applyLinearImpulse(new Vector2(-0.1f, 0), player.b2body.getWorldCenter(), true);
 	} 
-	
+	}
 	public void update(float dt){
 		
 		hud.update(dt);
@@ -204,7 +218,7 @@ public class PlayScreen implements Screen {
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
@@ -223,11 +237,17 @@ public class PlayScreen implements Screen {
 		// TODO Auto-generated method stub
 		return atlas;
 	}
+	public boolean gameOver(){
+		if(player.curentState == Postac.State.DEAD && player.getStateTimer()>3){
+			return true;
+		}else
+			return false;
+	}
 	
 	
 	@Override
 	public void dispose() {
-		texture.dispose();
+		
 		renderer.dispose();
 		game.dispose();
 		map.dispose();

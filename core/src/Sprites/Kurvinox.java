@@ -23,7 +23,9 @@ public class Kurvinox extends Enemy {
 	public boolean setToDestroy;
 	public boolean destroyed;
 	public boolean turn;
-	
+	public enum State{WALKING,DEAD};
+	public State curentState;
+	public State previusState;
 	
 	
 public Kurvinox(PlayScreen screen, float x, float y) {
@@ -38,7 +40,7 @@ public Kurvinox(PlayScreen screen, float x, float y) {
 			destroyed = false;
 			turn = false;
 	        setBounds(getX(),getY(),33/MyGdxGame.PPM,33/MyGdxGame.PPM);
-	        
+	        curentState = previusState = State.WALKING;
 	        
 }
 
@@ -56,7 +58,7 @@ public void defineEnemy() {
 		
 		fdef.filter.categoryBits = MyGdxGame.ENEMY_BIT;
 		fdef.filter.maskBits = MyGdxGame.GROUND_BIT 
-				| MyGdxGame.BRICK_BIT 
+				| MyGdxGame.BLOCK_BIT 
 				| MyGdxGame.COIN_BIT
 				| MyGdxGame.OBJECT_BIT
 				| MyGdxGame.BOMBA_BIT
@@ -89,30 +91,55 @@ public void defineEnemy() {
 
 public void update(float dt){
 		stateTime+=dt;
+		setRegion(getFrame(dt));
 	if(setToDestroy && !destroyed){
 			world.destroyBody(b2body);
-			
-			setRegion(new TextureRegion(((PlayScreen) screen).getAtlas().findRegion("plama"), 0,0,79,16));
+			 
+	    	  setBounds(getX(),getY()-0.33f,33/MyGdxGame.PPM,33/MyGdxGame.PPM);
+			  stateTime = 0;
 			destroyed = true;
-			setBounds(getX(),getY()-0.33f,33/MyGdxGame.PPM,33/MyGdxGame.PPM);
-			stateTime = 0;
+			curentState = State.DEAD;
 	}
 		
 	else if(!destroyed){
+		
 		b2body.setLinearVelocity(velocity);
 		setPosition(b2body.getPosition().x - getWidth() / 2, b2body.getPosition().y - getHeight() / 4);
 		setRegion(walkAnimation.getKeyFrame(stateTime, true));
 		
-			/*if(turn){
-				flip(true, false);
-			}*/
-		
 	}
 }
-		
+public TextureRegion getFrame(float dt){
+	TextureRegion region ;
+	  switch (curentState){
+	  default:
+          region = walkAnimation.getKeyFrame(stateTime, true);
+          break;
+      
+      case DEAD: 
+    	 region = new TextureRegion(((PlayScreen) screen).getAtlas().findRegion("plama"), 0,0,79,16);
+		break;	
+      
+  }
+	
+			
+	  if(velocity.x < 0 && region.isFlipX() == false){
+          region.flip(true, false);
+      }
+      if(velocity.x > 0 && region.isFlipX() == true){
+          region.flip(true, false);
+      }
+			
+		    stateTime = curentState == previusState ? stateTime + dt : 0;
+		    //update previous state
+		    previusState = curentState;
+		    //return our final adjusted frame
+		    return region;
+			
+		}
 		
 	public void draw(Batch batch){
-		if(!destroyed || stateTime<2){
+		if(!destroyed || stateTime<3){
 			super.draw(batch);
 		}
 	
@@ -126,11 +153,7 @@ public void update(float dt){
 		
 	}
 
-	@Override
-	public void turnAround() {
-		turn = true;
-		
-	}
+
 	
 	
 }

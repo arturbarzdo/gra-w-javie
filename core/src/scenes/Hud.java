@@ -20,7 +20,7 @@ public class Hud implements Disposable{
 	private static Integer score;
 	
 	Label countdownLabel;
-	static Label  scoreLabel;
+	public static Label  scoreLabel;
 	Label timeLabel;
 	Label levelLabel;
 	Label worldnLabel;

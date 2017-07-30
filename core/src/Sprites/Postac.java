@@ -16,19 +16,20 @@ import com.mygdx.game.MyGdxGame;
 import Screens.PlayScreen;
 
 public class Postac extends Sprite{
-	public enum State{STANDING,RUNNING,DEAD};
+	public enum State{STANDING,RUNNING,JUMP,DEAD};
 	public State curentState;
 	public State previusState;
 	public World world;
-	public static Body b2body;
+	public Body b2body;
 	private TextureRegion ludekStand;
 	private TextureRegion bombaDead;
 	
 	private Animation <TextureRegion>postacRun;
 	private float stateTimer;
 	private boolean runningRight;
-	private static boolean bombaIsDead;
-	
+	public static boolean bombaIsDead = false;
+	public static boolean Dead = false;
+	public static boolean finishlev = false;
 	
 	public Postac(PlayScreen screen){
 		super(screen.getAtlas().findRegion("b"));
@@ -48,8 +49,8 @@ public class Postac extends Sprite{
 
         frames.clear();
 		
-		ludekStand = new TextureRegion(getTexture(),180, 38,38,64);
-		bombaDead = new TextureRegion(getTexture(),180, 0,64,38);
+		ludekStand = new TextureRegion(getTexture(),180, 26,38,64);
+		bombaDead = new TextureRegion(getTexture(),259, 0,64,26);
 		setBounds(0,0,16/MyGdxGame.PPM,33/MyGdxGame.PPM);
 		setRegion(ludekStand);
 		definePostac();
@@ -57,6 +58,12 @@ public class Postac extends Sprite{
 	public void update(float dt){
 		setPosition(b2body.getPosition().x - getWidth()/2,b2body.getPosition().y - getHeight()/4);
 		setRegion(getFrame(dt));
+		if(bombaIsDead && !Dead){
+			world.destroyBody(b2body);
+			Dead =true;
+			setBounds(getX(),getY()-0.50f,33/MyGdxGame.PPM,16/MyGdxGame.PPM);
+			
+		}
 	}
 	public State getState(){
 	if(bombaIsDead)
@@ -76,6 +83,7 @@ public class Postac extends Sprite{
 		switch(curentState){
 		case DEAD:
 			region = bombaDead;
+			break;
 		case RUNNING:
 			region = (TextureRegion) postacRun.getKeyFrame(stateTimer,true);
 			break;
@@ -84,6 +92,7 @@ public class Postac extends Sprite{
 			default:
 				region = ludekStand;
 		}
+		
 		 //if mario is running left and the texture isnt facing left... flip it.
 	    if((b2body.getLinearVelocity().x < 0 || !runningRight) && !region.isFlipX()){
 	        region.flip(true, false);
@@ -95,7 +104,7 @@ public class Postac extends Sprite{
 	        region.flip(true, false);
 	        runningRight = true;
 	    }
-
+		
 	    //if the current state is the same as the previous state increase the state timer.
 	    //otherwise the state has changed and we need to reset timer.
 	    stateTimer = curentState == previusState ? stateTimer + dt : 0;
@@ -121,7 +130,7 @@ public class Postac extends Sprite{
 		
 		fdef.filter.categoryBits = MyGdxGame.BOMBA_BIT;
 		fdef.filter.maskBits = MyGdxGame.GROUND_BIT 
-				| MyGdxGame.BRICK_BIT 
+				| MyGdxGame.BLOCK_BIT 
 				| MyGdxGame.COIN_BIT 
 				| MyGdxGame.ENEMY_BIT
 				| MyGdxGame.OBJECT_BIT
@@ -138,9 +147,19 @@ public class Postac extends Sprite{
 		fdef.isSensor = true;
 		
 		b2body.createFixture(fdef).setUserData("head");
+		
+		
 	}
 	public static void isDead(){
 		bombaIsDead = true;
 	}
+	
+	public static void finish(){
+		finishlev = true;
+	}
+	
+	 public float getStateTimer(){
+	        return stateTimer;
+	    }
 
 }

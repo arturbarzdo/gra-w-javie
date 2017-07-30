@@ -39,5 +39,5 @@ public abstract class Enemy extends Sprite {
 	
 	public abstract void hitOnHead(Postac postac);
 	
-	public abstract void turnAround();
+	
 }

@@ -1,6 +1,5 @@
 package Sprites;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.MyGdxGame;
 
@@ -16,7 +15,7 @@ public class Coin extends InteractiveTiledObject{
 
 	@Override
 	public void onHeadHit() {
-		Gdx.app.log("Coin", "Coin colision");
+		
 		setCategoryFilter(MyGdxGame.DESTROYED_BIT);
 		getCell().setTile(null);
 		Hud.addScore(1);

@@ -39,15 +39,15 @@ public class WorldContactListener implements ContactListener{
                  ((Enemy)fixB.getUserData()).hitOnHead((Postac) fixA.getUserData());
              break;
 	            
-		case MyGdxGame.ENEMY_BIT | MyGdxGame.BRICK_BIT:
+		case MyGdxGame.ENEMY_BIT | MyGdxGame.BLOCK_BIT:
 			
 			 if(fixA.getFilterData().categoryBits == MyGdxGame.ENEMY_BIT){
                 ((Enemy)fixA.getUserData()).reverseVelocity(true,false);
-                ((Enemy)fixA.getUserData()).turnAround();
+               
 			 }
             else{
                 ((Enemy)fixB.getUserData()).reverseVelocity(true,false);
-                ((Enemy)fixB.getUserData()).turnAround();
+                
             }
             break;
 		case MyGdxGame.BOMBA_BIT | MyGdxGame.ENEMY_BIT:
@@ -56,6 +56,14 @@ public class WorldContactListener implements ContactListener{
                  Postac.isDead();
              
              break;
+             
+		case MyGdxGame.BOMBA_BIT | MyGdxGame.COMPLETE_BIT:
+			 
+			Postac.finish();
+           
+        
+        break;
+		
 		}
 	}
 
